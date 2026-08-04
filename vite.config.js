@@ -5,4 +5,5 @@ export default defineConfig({
   plugins: [react()],
   worker: { format: "es" },
   optimizeDeps: { exclude: ["kokoro-js"] },
+  test: { exclude: ["tests/**", "node_modules/**"] },
 });
