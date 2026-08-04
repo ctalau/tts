@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { parseNarrationScript } from "./timestamps.js";
 
 const voices = [
   ["af_heart", "Heart", "American · warm"], ["af_bella", "Bella", "American · bright"],
@@ -34,6 +35,13 @@ export default function App() {
 
   const generate = () => {
     if (!text.trim() || busy) return;
+    let narration;
+    try {
+      narration = parseNarrationScript(text);
+    } catch (parseError) {
+      setError(parseError.message);
+      return;
+    }
     setBusy(true); setError(""); setStatus("Starting private speech engine…");
     if (!worker.current) {
       worker.current = new Worker(new URL("./tts.worker.js", import.meta.url), { type: "module" });
@@ -48,7 +56,7 @@ export default function App() {
       if (data.type === "error") { setError(data.message); setBusy(false); setStatus(""); }
     };
     worker.current.onerror = () => { setError("The speech engine could not start. Try refreshing the page."); setBusy(false); };
-    worker.current.postMessage({ type: "generate", text: text.trim(), voice, speed });
+    worker.current.postMessage({ type: "generate", segments: narration.segments, voice, speed });
   };
 
   return <main>
@@ -65,7 +73,8 @@ export default function App() {
 
     <section className="studio" aria-label="Voice generator">
       <div className="field-head"><label htmlFor="script">Your script</label><span>{text.length} / 500</span></div>
-      <textarea id="script" maxLength={500} value={text} onChange={(e) => setText(e.target.value)} placeholder="Write something worth hearing…" />
+      <textarea id="script" aria-describedby="timestamp-help" maxLength={500} value={text} onChange={(e) => setText(e.target.value)} placeholder={'[0] First slide\n[7.2] Second slide\n[13] Third slide'} />
+      <p className="timestamp-help" id="timestamp-help"><strong>Time your narration</strong> (optional): start each line with seconds, such as <code>[7.2]</code>. Lines without timestamps are read normally.</p>
 
       <div className="controls">
         <div className="control"><label htmlFor="voice">Voice</label><div className="select-wrap">

@@ -1,4 +1,5 @@
 import { KokoroTTS } from "kokoro-js";
+import { combineTimedAudio, toWavBlob } from "./timestamps.js";
 
 const MODEL_ID = "onnx-community/Kokoro-82M-v1.0-ONNX";
 let modelPromise;
@@ -22,9 +23,16 @@ self.onmessage = async ({ data }) => {
   try {
     self.postMessage({ type: "status", message: "Loading Kokoro…" });
     const tts = await loadModel();
-    self.postMessage({ type: "status", message: "Creating your audio…" });
-    const audio = await tts.generate(data.text, { voice: data.voice, speed: data.speed });
-    self.postMessage({ type: "result", blob: audio.toBlob() });
+    const clips = [];
+    for (let index = 0; index < data.segments.length; index += 1) {
+      const segment = data.segments[index];
+      self.postMessage({ type: "status", message: data.segments.length > 1 ? `Narrating segment ${index + 1} of ${data.segments.length}…` : "Creating your audio…" });
+      const audio = await tts.generate(segment.text, { voice: data.voice, speed: data.speed });
+      clips.push({ start: segment.start, audio: audio.audio, sampleRate: audio.sampling_rate });
+    }
+    const sampleRate = clips[0].sampleRate;
+    const combined = combineTimedAudio(clips, sampleRate);
+    self.postMessage({ type: "result", blob: toWavBlob(combined, sampleRate) });
   } catch (error) {
     self.postMessage({
       type: "error",

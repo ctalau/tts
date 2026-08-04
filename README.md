@@ -11,6 +11,16 @@ npm run dev
 
 The first generation downloads the quantized Kokoro model from Hugging Face. Browser caching makes later visits faster.
 
+To schedule narration, put a timestamp in seconds at the beginning of every non-empty line. The generated WAV preserves silence before each segment (and mixes segments if their scheduled times overlap):
+
+```text
+[0] First slide
+[7.2] Second slide
+[13] Third slide
+```
+
+Scripts without timestamps continue to be narrated normally.
+
 ## Checks
 
 ```bash

@@ -18,6 +18,9 @@ h1 em { font-family: Georgia, serif; font-weight: 400; color: #29654d; }
 .field-head span, output { color: #8a948e; font-size: 11px; font-weight: 500; }
 textarea { width: 100%; height: 148px; resize: vertical; padding: 17px 18px; color: #25332c; background: #f8f6f0; border: 1px solid #dfded7; border-radius: 11px; font-size: 15px; line-height: 1.65; outline: none; transition: .2s; }
 textarea:focus, select:focus { border-color: #709580; box-shadow: 0 0 0 3px #e3ebe5; }
+.timestamp-help { margin: 8px 2px 0; color: #748078; font-size: 11px; line-height: 1.5; }
+.timestamp-help strong { color: #52645a; }
+.timestamp-help code { padding: 1px 4px; color: #52645a; background: #edf1ed; border-radius: 4px; }
 .controls { display: grid; grid-template-columns: 1.25fr 1fr; gap: 32px; margin: 25px 0 27px; }
 .select-wrap { position: relative; }
 .select-wrap:after { content: "⌄"; position: absolute; right: 13px; top: 9px; pointer-events: none; color: #5d6b64; }
